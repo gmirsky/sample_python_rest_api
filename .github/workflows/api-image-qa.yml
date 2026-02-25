@@ -11,7 +11,7 @@ jobs:
   build_scan_push:
     runs-on: ubuntu-latest
     env:
-      ACR_NAME: sampleqaacr
+      ACR_NAME: sampleqa046948ed936aacr
       IMAGE_NAME: sample-python-rest-api
     steps:
       - uses: actions/checkout@v4

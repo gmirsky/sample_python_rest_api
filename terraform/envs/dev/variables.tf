@@ -5,5 +5,5 @@ variable "location" {
 
 variable "acr_name" {
   type    = string
-  default = "sample_dev_acr"
+  default = "sample_dev_046948ed936a_acr"
 }
