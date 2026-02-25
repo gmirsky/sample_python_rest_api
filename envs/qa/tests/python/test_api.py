@@ -4,52 +4,62 @@ from fastapi.testclient import TestClient
 
 from app.main import app, create_app
 
+# HTTPS client for standard API checks.
 https_client = TestClient(app, base_url="https://testserver")
+# HTTP client for redirect behavior checks.
 http_client = TestClient(app, base_url="http://testserver")
 
 
+# Health endpoint returns static OK body.
 def test_health_endpoint() -> None:
     response = https_client.get("/health")
     assert response.status_code == 200
     assert response.text == "OK"
 
 
+# IPv4 endpoint returns dotted-quad format.
 def test_ipv4_endpoint() -> None:
     response = https_client.get("/ipv4")
     assert response.status_code == 200
     assert re.match(r"^\d{1,3}(\.\d{1,3}){3}$", response.text)
 
 
+# IPv6 endpoint returns non-empty output.
 def test_ipv6_endpoint() -> None:
     response = https_client.get("/ipv6")
     assert response.status_code == 200
     assert response.text
 
 
+# Architecture endpoint returns non-empty output.
 def test_arch_endpoint() -> None:
     response = https_client.get("/arch")
     assert response.status_code == 200
     assert response.text
 
 
+# Uptime endpoint returns numeric string.
 def test_uptime_endpoint() -> None:
     response = https_client.get("/uptime")
     assert response.status_code == 200
     assert response.text.isdigit()
 
 
+# Hostname endpoint returns non-empty output.
 def test_hostname_endpoint() -> None:
     response = https_client.get("/hostname")
     assert response.status_code == 200
     assert response.text
 
 
+# Default config should not redirect HTTP requests.
 def test_http_does_not_redirect_by_default() -> None:
     response = http_client.get("/health", follow_redirects=False)
     assert response.status_code == 200
     assert response.text == "OK"
 
 
+# Explicit redirect config should enforce HTTPS redirects.
 def test_http_redirects_to_https_when_enabled() -> None:
     redirect_app = create_app(enable_https_redirect=True)
     redirect_http_client = TestClient(redirect_app, base_url="http://testserver")

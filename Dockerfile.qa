@@ -1,6 +1,6 @@
 FROM cgr.dev/chainguard/python:latest-dev AS builder
 WORKDIR /app
-COPY requirements.txt .
+COPY envs/qa/requirements.txt ./requirements.txt
 RUN python -m venv /app/.venv \
 	&& /app/.venv/bin/python -m ensurepip --upgrade \
 	&& /app/.venv/bin/python -m pip install --no-cache-dir --upgrade pip setuptools wheel \

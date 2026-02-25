@@ -234,6 +234,33 @@ Image workflows:
 - Scan with Trivy for `HIGH,CRITICAL` vulnerabilities.
 - Push to environment ACR.
 
+## GitHub Repository Environments (Development/QA/Prod)
+
+Create repository environments using GitHub CLI:
+
+```bash
+gh auth login
+gh api --method PUT repos/gmirsky/sample_python_rest_api/environments/development
+gh api --method PUT repos/gmirsky/sample_python_rest_api/environments/qa
+gh api --method PUT repos/gmirsky/sample_python_rest_api/environments/prod
+```
+
+Set environment-scoped secrets (examples):
+
+```bash
+gh secret set AZURE_CLIENT_ID --env development --body "<dev-client-id>"
+gh secret set AZURE_CLIENT_ID --env qa --body "<qa-client-id>"
+gh secret set AZURE_CLIENT_ID --env prod --body "<prod-client-id>"
+```
+
+Set environment-scoped variables (examples):
+
+```bash
+gh variable set TFSTATE_STORAGE_ACCOUNT --env development --body "<dev-tfstate-storage-account>"
+gh variable set TFSTATE_STORAGE_ACCOUNT --env qa --body "<qa-tfstate-storage-account>"
+gh variable set TFSTATE_STORAGE_ACCOUNT --env prod --body "<prod-tfstate-storage-account>"
+```
+
 ## Required GitHub Repository Variables
 
 Set these in repository settings (`Settings` → `Secrets and variables` → `Actions`):
