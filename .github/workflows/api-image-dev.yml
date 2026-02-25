@@ -1,0 +1,38 @@
+name: api-image-dev
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build_scan_push:
+    runs-on: ubuntu-latest
+    env:
+      ACR_NAME: sampledevacr
+      IMAGE_NAME: sample-python-rest-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Build image (Chainguard base)
+        run: docker build -t "${IMAGE_NAME}:${GITHUB_SHA}" .
+      - name: Scan image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          format: table
+          exit-code: "1"
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+      - name: Tag image for ACR
+        run: docker tag "${IMAGE_NAME}:${GITHUB_SHA}" "${ACR_NAME}.azurecr.io/${IMAGE_NAME}:${GITHUB_SHA}"
+      - name: Login to ACR
+        run: az acr login --name "${ACR_NAME}"
+      - name: Push image to ACR
+        run: docker push "${ACR_NAME}.azurecr.io/${IMAGE_NAME}:${GITHUB_SHA}"

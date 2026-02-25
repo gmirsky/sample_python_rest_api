@@ -1,0 +1,3 @@
+location                     = "eastus"
+tfstate_storage_account_name = "tfsampletfstate01"
+terraform_principal_id       = "00000000-0000-0000-0000-000000000000"
