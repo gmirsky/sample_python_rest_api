@@ -19,8 +19,8 @@ resource "azurerm_storage_container" "tfstate" {
   container_access_type = "private"
 }
 
-resource "azurerm_role_assignment" "tfstate_blob_access" {
-  scope                = azurerm_storage_account.tfstate.id
-  role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = var.terraform_principal_id
-}
+# resource "azurerm_role_assignment" "tfstate_blob_access" {
+#   scope                = azurerm_storage_account.tfstate.id
+#   role_definition_name = "Storage Blob Data Contributor"
+#   principal_id         = var.terraform_principal_id
+# }
