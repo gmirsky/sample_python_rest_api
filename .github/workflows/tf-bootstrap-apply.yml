@@ -33,6 +33,13 @@ jobs:
         run: terraform validate
       - name: Terraform apply
         run: |
-          terraform apply -auto-approve -input=false \
-            -var="terraform_principal_id=${{ secrets.TERRAFORM_MI_PRINCIPAL_ID }}" \
-            -var="tfstate_storage_account_name=${{ secrets.TFSTATE_STORAGE_ACCOUNT }}"
+          TF_VARS=(
+            "-var=terraform_principal_id=${{ secrets.TERRAFORM_MI_PRINCIPAL_ID }}"
+            "-var=tfstate_storage_account_name=${{ secrets.TFSTATE_STORAGE_ACCOUNT }}"
+          )
+
+          if ! terraform apply -auto-approve -input=false "${TF_VARS[@]}"; then
+            echo "Terraform apply failed. Running cleanup destroy..."
+            terraform destroy -auto-approve -input=false "${TF_VARS[@]}"
+            exit 1
+          fi

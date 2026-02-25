@@ -40,4 +40,9 @@ jobs:
       - name: Terraform validate
         run: terraform validate
       - name: Terraform apply
-        run: terraform apply -auto-approve -input=false
+        run: |
+          if ! terraform apply -auto-approve -input=false; then
+            echo "Terraform apply failed. Running cleanup destroy..."
+            terraform destroy -auto-approve -input=false
+            exit 1
+          fi
