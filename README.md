@@ -9,8 +9,10 @@ This repository contains:
 
 ## Repository Structure
 
-- `app/`: FastAPI application source.
-- `tests/python/`: Python API endpoint tests.
+- `envs/dev/app/`: FastAPI application source (dev).
+- `envs/qa/app/`: FastAPI application source (qa).
+- `envs/prod/app/`: FastAPI application source (prod).
+- `envs/*/tests/python/`: Python API endpoint tests per environment.
 - `tests/terraform/`: Terraform format/validate tests.
 - `scripts/`: Utility scripts.
 - `terraform/bootstrap/`: Creates `terraform_tfdata_rg` and storage for tfstate.
@@ -83,28 +85,28 @@ HTTP to HTTPS redirection is configurable via `ENABLE_HTTPS_REDIRECT`:
 - `false` (default): serve HTTP without redirect (non-prod friendly)
 - `true`: enable HTTP to HTTPS redirects (recommended for prod behind TLS)
 
-Run locally:
+Run locally (dev by default):
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ./scripts/generate_tls_certs.sh
-uvicorn app.main:app --host 0.0.0.0 --port 8443 --ssl-keyfile certs/server.key --ssl-certfile certs/server.crt
+PYTHONPATH=envs/dev uvicorn app.main:app --host 0.0.0.0 --port 8443 --ssl-keyfile certs/server.key --ssl-certfile certs/server.crt
 ```
 
 Run locally without redirect (HTTP):
 
 ```bash
-ENABLE_HTTPS_REDIRECT=false uvicorn app.main:app --host 0.0.0.0 --port 8443
+ENABLE_HTTPS_REDIRECT=false PYTHONPATH=envs/dev uvicorn app.main:app --host 0.0.0.0 --port 8443
 ```
 
 ## Tests
 
-Run Python + Terraform tests:
+Run Python + Terraform tests (dev by default):
 
 ```bash
-pytest
+pytest envs/dev/tests/python
 ```
 
 Terraform tests (`tests/terraform/test_terraform_validate.py`) run:
@@ -129,6 +131,8 @@ make ci-local-all
 make ci-local-all-no-venv
 make tls-certs
 make run-api
+make -f Makefile.qa run-api
+make -f Makefile.prod run-api
 ```
 
 When to use:

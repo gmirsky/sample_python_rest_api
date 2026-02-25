@@ -4,6 +4,9 @@ PIP := $(VENV_DIR)/bin/pip
 PYTEST := $(VENV_DIR)/bin/pytest
 UVICORN := $(VENV_DIR)/bin/uvicorn
 
+APP_ENV ?= dev
+APP_DIR := envs/$(APP_ENV)
+
 TFSTATE_RG ?= terraform_tfdata_rg
 TFSTATE_SA ?= $(TFSTATE_STORAGE_ACCOUNT)
 AZURE_TENANT_ID ?=
@@ -19,6 +22,7 @@ AZURE_CLIENT_ID ?=
 help:
 	@echo "Targets:"
 	@echo "  venv, install, test, ci-local, ci-local-fast, ci-local-tf, ci-local-all, ci-local-all-no-venv, tls-certs, run-api"
+	@echo "  APP_ENV=dev|qa|prod"
 	@echo "  tf-bootstrap-init|validate|plan|apply|destroy"
 	@echo "  tf-dev-init|validate|plan|apply|destroy"
 	@echo "  tf-qa-init|validate|plan|apply|destroy"
@@ -31,7 +35,7 @@ install: venv
 	$(PIP) install -r requirements.txt
 
 test:
-	$(PYTEST) -q
+	PYTHONPATH=$(APP_DIR) $(PYTEST) -q $(APP_DIR)/tests/python
 
 ci-local-fast: test
 
@@ -55,7 +59,7 @@ tls-certs:
 	./scripts/generate_tls_certs.sh
 
 run-api:
-	$(UVICORN) app.main:app --host 0.0.0.0 --port 8443 --ssl-keyfile certs/server.key --ssl-certfile certs/server.crt
+	PYTHONPATH=$(APP_DIR) $(UVICORN) app.main:app --host 0.0.0.0 --port 8443 --ssl-keyfile certs/server.key --ssl-certfile certs/server.crt
 
 # Bootstrap
 TF_BOOTSTRAP_DIR := terraform/bootstrap

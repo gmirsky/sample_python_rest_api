@@ -1,0 +1,4 @@
+APP_ENV := qa
+APP_DIR := envs/qa
+
+include Makefile

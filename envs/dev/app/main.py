@@ -12,6 +12,7 @@ from app.system_info import (
     get_uptime_seconds,
 )
 
+
 def _is_truthy(value: str | None) -> bool:
     if value is None:
         return False

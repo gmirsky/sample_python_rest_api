@@ -10,7 +10,7 @@ FROM cgr.dev/chainguard/python:latest
 WORKDIR /app
 ARG ENABLE_HTTPS_REDIRECT=false
 COPY --from=builder /app/.venv /app/.venv
-COPY envs/dev/app ./app
+COPY envs/qa/app ./app
 ENV PATH="/app/.venv/bin:${PATH}"
 ENV ENABLE_HTTPS_REDIRECT=${ENABLE_HTTPS_REDIRECT}
 EXPOSE 8443
