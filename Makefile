@@ -64,7 +64,7 @@ run-api:
 # Bootstrap
 TF_BOOTSTRAP_DIR := terraform/bootstrap
 
-TF_BOOTSTRAP_VAR_ARGS = -var="terraform_principal_id=$${TERRAFORM_MI_PRINCIPAL_ID}" -var="tfstate_storage_account_name=$(TFSTATE_SA)"
+TF_BOOTSTRAP_VAR_ARGS = -var="tfstate_storage_account_name=$(TFSTATE_SA)"
 
 tf-bootstrap-init:
 	cd $(TF_BOOTSTRAP_DIR) && terraform init -input=false

@@ -13,8 +13,3 @@ variable "tfstate_storage_account_name" {
     error_message = "Storage account name must be 3-24 chars, lowercase letters and numbers only."
   }
 }
-
-variable "terraform_principal_id" {
-  type        = string
-  description = "Object ID of the Terraform managed identity service principal."
-}

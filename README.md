@@ -53,7 +53,6 @@ Use output values to set repository Variables:
 - `AZURE_TENANT_ID`
 - `AZURE_SUBSCRIPTION_ID`
 - `AZURE_CLIENT_ID`
-- `TERRAFORM_MI_PRINCIPAL_ID`
 - `TFSTATE_STORAGE_ACCOUNT` (you choose this name before bootstrap apply)
 
 ## Self-Signed TLS Script
@@ -142,7 +141,6 @@ When to use:
 Terraform bootstrap:
 
 ```bash
-export TERRAFORM_MI_PRINCIPAL_ID="<principal-id>"
 export TFSTATE_STORAGE_ACCOUNT="<storage-account-name>"
 make tf-bootstrap-init
 make tf-bootstrap-validate
@@ -170,7 +168,6 @@ Creates:
 - Resource group: `terraform_tfdata_rg`
 - Storage account: `${TFSTATE_STORAGE_ACCOUNT}`
 - Blob container: `tfstate`
-- RBAC assignment (`Storage Blob Data Contributor`) for `TERRAFORM_MI_PRINCIPAL_ID`
 
 Local plan/apply example:
 
@@ -179,10 +176,8 @@ cd terraform/bootstrap
 terraform init
 terraform validate
 terraform plan \
-  -var="terraform_principal_id=<TERRAFORM_MI_PRINCIPAL_ID>" \
   -var="tfstate_storage_account_name=<TFSTATE_STORAGE_ACCOUNT>"
 terraform apply -auto-approve \
-  -var="terraform_principal_id=<TERRAFORM_MI_PRINCIPAL_ID>" \
   -var="tfstate_storage_account_name=<TFSTATE_STORAGE_ACCOUNT>"
 ```
 
@@ -267,6 +262,5 @@ Set these in repository settings (`Settings` → `Secrets and variables` → `Ac
 - `AZURE_CLIENT_ID`
 - `AZURE_TENANT_ID`
 - `AZURE_SUBSCRIPTION_ID`
-- `TERRAFORM_MI_PRINCIPAL_ID`
 - `TFSTATE_STORAGE_ACCOUNT`
 
