@@ -1,12 +1,18 @@
 FROM cgr.dev/chainguard/python:latest-dev AS builder
 WORKDIR /app
 COPY requirements.txt .
-RUN python -m venv /venv && /venv/bin/pip install --no-cache-dir -r requirements.txt
+RUN python -m venv /app/.venv \
+	&& /app/.venv/bin/python -m ensurepip --upgrade \
+	&& /app/.venv/bin/python -m pip install --no-cache-dir --upgrade pip setuptools wheel \
+	&& /app/.venv/bin/python -m pip install --no-cache-dir -r requirements.txt
 
 FROM cgr.dev/chainguard/python:latest
 WORKDIR /app
-COPY --from=builder /venv /venv
+ARG ENABLE_HTTPS_REDIRECT=false
+COPY --from=builder /app/.venv /app/.venv
 COPY app ./app
-ENV PATH="/venv/bin:${PATH}"
+ENV PATH="/app/.venv/bin:${PATH}"
+ENV ENABLE_HTTPS_REDIRECT=${ENABLE_HTTPS_REDIRECT}
 EXPOSE 8443
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8443", "--ssl-keyfile", "certs/server.key", "--ssl-certfile", "certs/server.crt"]
+ENTRYPOINT ["/app/.venv/bin/python"]
+CMD ["-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8443"]

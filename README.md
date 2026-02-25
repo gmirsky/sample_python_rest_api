@@ -1,7 +1,7 @@
 # sample_python_rest_api
 
 This repository contains:
-- A Python REST API with host architecture endpoints and HTTPS redirect.
+- A Python REST API with host architecture endpoints and optional HTTPS redirect.
 - Terraform for Azure bootstrap state storage and environment infrastructure (dev, qa, prod).
 - Scripts for Azure Managed Identity creation and self-signed TLS certificate generation.
 - Tests for Python API endpoints and Terraform validation.
@@ -79,7 +79,9 @@ Endpoints:
 - `GET /uptime` → host uptime in seconds
 - `GET /hostname` → host hostname
 
-HTTP to HTTPS redirection is enabled via middleware.
+HTTP to HTTPS redirection is configurable via `ENABLE_HTTPS_REDIRECT`:
+- `false` (default): serve HTTP without redirect (non-prod friendly)
+- `true`: enable HTTP to HTTPS redirects (recommended for prod behind TLS)
 
 Run locally:
 
@@ -89,6 +91,12 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ./scripts/generate_tls_certs.sh
 uvicorn app.main:app --host 0.0.0.0 --port 8443 --ssl-keyfile certs/server.key --ssl-certfile certs/server.crt
+```
+
+Run locally without redirect (HTTP):
+
+```bash
+ENABLE_HTTPS_REDIRECT=false uvicorn app.main:app --host 0.0.0.0 --port 8443
 ```
 
 ## Tests
