@@ -1,0 +1,6 @@
+# Azure Configuration
+# Copy this file to azure_config.txt and fill in your values
+# DO NOT commit azure_config.txt with real credentials
+
+TENANT_ID=your-tenant-id-here
+SUBSCRIPTION_ID=your-subscription-id-here

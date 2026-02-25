@@ -1,8 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TENANT_ID="cdfd8274-8496-4ddd-a787-3294cbb74006"
-SUBSCRIPTION_ID="9a9de21e-de1a-4984-81eb-046948ed936a"
+# Read Azure credentials from config file
+CONFIG_FILE="$(dirname "$0")/azure_config.txt"
+
+if [[ ! -f "$CONFIG_FILE" ]]; then
+  echo "Error: Configuration file not found: $CONFIG_FILE"
+  echo "Create the file with the following format:"
+  echo "TENANT_ID=your-tenant-id-here"
+  echo "SUBSCRIPTION_ID=your-subscription-id-here"
+  exit 1
+fi
+
+# Source the config file
+set -a
+source "$CONFIG_FILE"
+set +a
+
+# Validate required variables
+if [[ -z "${TENANT_ID:-}" ]] || [[ -z "${SUBSCRIPTION_ID:-}" ]]; then
+  echo "Error: TENANT_ID and SUBSCRIPTION_ID must be set in $CONFIG_FILE"
+  exit 1
+fi
+
 IDENTITY_RG="terraform_identity_rg"
 IDENTITY_LOCATION="eastus"
 IDENTITY_NAME="terraform-mi"

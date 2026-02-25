@@ -8,3 +8,4 @@ certs/
 *.tfstate.backup
 .terraform/
 *.tfplan
+scripts/azure_config.txt

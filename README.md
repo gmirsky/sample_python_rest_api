@@ -33,9 +33,12 @@ Script: `scripts/create_terraform_managed_identity.sh`
 
 This script creates a user-assigned managed identity for Terraform and configures a GitHub OIDC federated credential.
 
-Azure values are embedded as requested:
-- Tenant ID: `cdfd8274-8496-4ddd-a787-3294cbb74006`
-- Subscription ID: `9a9de21e-de1a-4984-81eb-046948ed936a`
+Create a `scripts/azure_config.txt` file with your Azure credentials:
+
+```bash
+TENANT_ID=your-tenant-id-here
+SUBSCRIPTION_ID=your-subscription-id-here
+```
 
 Run:
 
@@ -139,8 +142,8 @@ Terraform env backends (dev/qa/prod init):
 
 ```bash
 export TFSTATE_STORAGE_ACCOUNT="<storage-account-name>"
-export AZURE_TENANT_ID="cdfd8274-8496-4ddd-a787-3294cbb74006"
-export AZURE_SUBSCRIPTION_ID="9a9de21e-de1a-4984-81eb-046948ed936a"
+export AZURE_TENANT_ID="<your-tenant-id>"
+export AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
 export AZURE_CLIENT_ID="<managed-identity-client-id>"
 make tf-dev-init && make tf-dev-plan
 make tf-qa-init && make tf-qa-plan
