@@ -246,6 +246,28 @@ Image workflows:
 
 ## GitHub Repository Environments (Development/QA/Prod)
 
+## GitHub PAT via GitHub CLI
+
+If you need a token for CLI/API automation, you can authenticate with GitHub CLI and retrieve the token:
+
+```bash
+gh auth login
+gh auth refresh -h github.com -s repo,workflow,admin:repo_hook
+gh auth token
+```
+
+Optional: save it to an environment variable for the current shell session:
+
+```bash
+export GITHUB_TOKEN="$(gh auth token)"
+```
+
+macOS tip: copy the token to your clipboard:
+
+```bash
+gh auth token | pbcopy
+```
+
 Create repository environments using GitHub CLI:
 
 ```bash

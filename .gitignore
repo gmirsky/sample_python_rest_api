@@ -25,3 +25,6 @@ scripts/azure_config.txt
 *.tfstate.*
 .terraform/
 *.tfplan
+
+# Ignore developer specific files
+notes.txt

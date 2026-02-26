@@ -87,6 +87,7 @@ jobs:
       - name: Create pull request
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ secrets.REQUIREMENTS_UPDATE_PAT }}
           commit-message: "chore(deps): update env requirements"
           title: "chore(deps): update environment requirements"
           body: |
