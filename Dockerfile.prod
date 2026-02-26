@@ -1,3 +1,4 @@
+# Builder stage: create virtualenv and install dependencies.
 FROM cgr.dev/chainguard/python:latest-dev AS builder
 WORKDIR /app
 COPY envs/prod/requirements.txt ./requirements.txt
@@ -6,6 +7,7 @@ RUN python -m venv /app/.venv \
 	&& /app/.venv/bin/python -m pip install --no-cache-dir --upgrade pip setuptools wheel \
 	&& /app/.venv/bin/python -m pip install --no-cache-dir -r requirements.txt
 
+# Runtime stage: copy only app code and prepared virtualenv.
 FROM cgr.dev/chainguard/python:latest
 WORKDIR /app
 ARG ENABLE_HTTPS_REDIRECT=false
@@ -13,6 +15,7 @@ COPY --from=builder --chown=65532:65532 /app/.venv /app/.venv
 COPY --chown=65532:65532 envs/prod/app ./app
 ENV PATH="/app/.venv/bin:${PATH}"
 ENV ENABLE_HTTPS_REDIRECT=${ENABLE_HTTPS_REDIRECT}
+# The user with UID 65532 is the default, pre-configured non-root user in chainguard python container images.
 USER 65532:65532
 EXPOSE 8443
 ENTRYPOINT ["/app/.venv/bin/python"]

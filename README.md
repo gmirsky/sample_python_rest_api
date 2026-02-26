@@ -228,6 +228,7 @@ Image workflows:
 - Build Docker image using Chainguard Python base image.
 - Scan with Trivy for `HIGH,CRITICAL` vulnerabilities.
 - Push to environment ACR.
+- The user with UID 65532 is the default, pre-configured non-root user in chainguard python container images.
 - Runtime user is non-root (`UID:GID 65532:65532`); ensure mounted host paths are readable/writable by that user when needed.
 
 ## GitHub Repository Environments (Development/QA/Prod)
