@@ -1,9 +1,29 @@
+# VCS and CI metadata
 .git
-.venv
-__pycache__
-.pytest_cache
-tests
-terraform
+.gitignore
 .github
+
+# Local Python environment and cache artifacts
+.venv
+.pytest_cache
+**/__pycache__
+*.pyc
+*.pyo
+
+# Project files not needed for runtime image build context
+tests
+envs/*/tests
+terraform
+scripts
+Makefile
+Makefile.dev
+Makefile.qa
+Makefile.prod
+pytest.ini
+README.md
+
+# Local cert and Terraform artifacts
+certs
 *.tfstate
+*.tfstate.*
 *.tfplan

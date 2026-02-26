@@ -1,11 +1,27 @@
+# Python bytecode/cache
 __pycache__/
 *.pyc
+
+# Python tooling / virtual env
 .pytest_cache/
 .venv/
 .env
+.coverage
+.coverage.*
+htmlcov/
+
+# OS / editor local files
+.DS_Store
+.vscode/
+.idea/
+
+# Local certs and secrets
 certs/
+scripts/certs/
+scripts/azure_config.txt
+
+# Terraform local state and working directories
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
 .terraform/
 *.tfplan
-scripts/azure_config.txt

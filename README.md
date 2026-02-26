@@ -9,6 +9,8 @@ This repository contains:
 
 ## Repository Structure
 
+Docker builds use a slim context defined in `.dockerignore` to exclude local, test, and Terraform files.
+
 - `envs/dev/app/`: FastAPI application source (dev).
 - `envs/qa/app/`: FastAPI application source (qa).
 - `envs/prod/app/`: FastAPI application source (prod).
