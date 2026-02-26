@@ -1,0 +1,91 @@
+name: create-qa-and-dev-branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: Branch name suffix
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  create-branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create QA and DEV branches
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const suffix = core.getInput('name', { required: true }).trim();
+
+            if (!suffix) {
+              core.setFailed('Input "name" cannot be empty.');
+              return;
+            }
+
+            if (!/^[A-Za-z0-9._-]+$/.test(suffix)) {
+              core.setFailed('Input "name" contains invalid characters. Allowed: letters, numbers, dot, underscore, hyphen.');
+              return;
+            }
+
+            const qaBranch = `qa-${suffix}`;
+            const devBranch = `dev-${suffix}`;
+
+            async function branchExists(branchName) {
+              try {
+                await github.rest.git.getRef({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: `heads/${branchName}`
+                });
+                return true;
+              } catch (error) {
+                if (error.status === 404) {
+                  return false;
+                }
+                throw error;
+              }
+            }
+
+            const mainRef = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'heads/main'
+            });
+
+            const qaExists = await branchExists(qaBranch);
+
+            if (!qaExists) {
+              await github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/heads/${qaBranch}`,
+                sha: mainRef.data.object.sha
+              });
+              core.notice(`Created branch: ${qaBranch}`);
+            } else {
+              core.notice(`Branch already exists, skipping create: ${qaBranch}`);
+            }
+
+            const qaRef = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `heads/${qaBranch}`
+            });
+
+            const devExists = await branchExists(devBranch);
+
+            if (!devExists) {
+              await github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/heads/${devBranch}`,
+                sha: qaRef.data.object.sha
+              });
+              core.notice(`Created branch: ${devBranch}`);
+            } else {
+              core.notice(`Branch already exists, skipping create: ${devBranch}`);
+            }
