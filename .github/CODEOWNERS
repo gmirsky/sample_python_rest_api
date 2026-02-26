@@ -1,3 +1,5 @@
+* @production @qa
+
 envs/prod/* @production
 terraform/bootstrap/* @production
 terraform/envs/prod/* @production
