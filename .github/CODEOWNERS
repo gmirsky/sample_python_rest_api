@@ -9,6 +9,7 @@ Makefile.prod @production
 .github/workflows/tf-prod-apply.yml @production
 .github/workflows/tf-prod-destroy.yml @production
 .github/workflows/update-env-requirements.yml @production
+.github/workflows/create-qa-and-dev-branch.yml @production
 
 envs/qa/* @qa
 terraform/envs/qa/* @qa
