@@ -6,6 +6,7 @@ VENV_DIR ?= .venv
 PIP := $(VENV_DIR)/bin/pip
 PYTEST := $(VENV_DIR)/bin/pytest
 UVICORN := $(VENV_DIR)/bin/uvicorn
+COVERAGE_FILE ?= .coverage
 
 # Environment selector for app code, tests, and dependencies.
 APP_ENV ?= dev
@@ -18,7 +19,7 @@ AZURE_TENANT_ID ?=
 AZURE_SUBSCRIPTION_ID ?=
 AZURE_CLIENT_ID ?=
 
-.PHONY: help venv install test ci-local ci-local-fast ci-local-tf ci-local-all ci-local-all-no-venv run-api tls-certs \
+.PHONY: help venv install test test-cov test-cov-all ci-local ci-local-fast ci-local-tf ci-local-all ci-local-all-no-venv run-api tls-certs \
 	tf-bootstrap-init tf-bootstrap-validate tf-bootstrap-plan tf-bootstrap-apply tf-bootstrap-destroy \
 	tf-dev-init tf-dev-validate tf-dev-plan tf-dev-apply tf-dev-destroy \
 	tf-qa-init tf-qa-validate tf-qa-plan tf-qa-apply tf-qa-destroy \
@@ -26,7 +27,7 @@ AZURE_CLIENT_ID ?=
 
 help:
 	@echo "Targets:"
-	@echo "  venv, install, test, ci-local, ci-local-fast, ci-local-tf, ci-local-all, ci-local-all-no-venv, tls-certs, run-api"
+	@echo "  venv, install, test, test-cov, test-cov-all, ci-local, ci-local-fast, ci-local-tf, ci-local-all, ci-local-all-no-venv, tls-certs, run-api"
 	@echo "  APP_ENV=dev|qa|prod (install uses envs/\$$(APP_ENV)/requirements.txt)"
 	@echo "  tf-bootstrap-init|validate|plan|apply|destroy"
 	@echo "  tf-dev-init|validate|plan|apply|destroy"
@@ -43,6 +44,18 @@ install: venv
 # Runs API tests for the selected APP_ENV.
 test:
 	PYTHONPATH=$(APP_DIR) $(PYTEST) -q $(APP_DIR)/tests/python
+
+# Runs API tests with coverage for the selected APP_ENV.
+test-cov:
+	PYTHONPATH=$(APP_DIR) COVERAGE_FILE=$(COVERAGE_FILE).$(APP_ENV) $(PYTEST) -q $(APP_DIR)/tests/python --cov=$(APP_DIR)/app --cov-report=term-missing
+
+# Runs API tests with combined coverage for dev, qa, and prod.
+test-cov-all:
+	rm -f $(COVERAGE_FILE)
+	PYTHONPATH=envs/dev COVERAGE_FILE=$(COVERAGE_FILE) $(PYTEST) -q envs/dev/tests/python --cov=envs/dev/app --cov-report=
+	PYTHONPATH=envs/qa COVERAGE_FILE=$(COVERAGE_FILE) $(PYTEST) -q envs/qa/tests/python --cov=envs/qa/app --cov-append --cov-report=
+	PYTHONPATH=envs/prod COVERAGE_FILE=$(COVERAGE_FILE) $(PYTEST) -q envs/prod/tests/python --cov=envs/prod/app --cov-append --cov-report=
+	$(VENV_DIR)/bin/python -m coverage report -m
 
 ci-local-fast: test
 

@@ -110,6 +110,15 @@ Run Python + Terraform tests (dev by default):
 pytest envs/dev/tests/python
 ```
 
+Run Python coverage tests:
+
+```bash
+make test-cov APP_ENV=dev
+make -f Makefile.qa test-cov
+make -f Makefile.prod test-cov
+make test-cov-all
+```
+
 Terraform tests (`tests/terraform/test_terraform_validate.py`) run:
 - `terraform fmt -check -recursive`
 - `terraform init -backend=false`
@@ -125,6 +134,8 @@ Common commands:
 make help
 make install
 make test
+make test-cov
+make test-cov-all
 make ci-local
 make ci-local-fast
 make ci-local-tf
