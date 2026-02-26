@@ -1,0 +1,20 @@
+envs/prod/* @production
+terraform/bootstrap/* @production
+terraform/envs/prod/* @production
+Dockerfile.prod @production
+Makefile @production
+Makefile.prod @production
+.github/workflows/api-image-prod.yml @production
+.github/workflows/tf-prod-plan.yml @production
+.github/workflows/tf-prod-apply.yml @production
+.github/workflows/tf-prod-destroy.yml @production
+.github/workflows/update-env-requirements.yml @production
+
+envs/qa/* @qa
+terraform/envs/qa/* @qa
+Dockerfile.qa @qa
+Makefile.qa @qa
+.github/workflows/api-image-qa.yml @qa
+.github/workflows/tf-qa-plan.yml @qa
+.github/workflows/tf-qa-apply.yml @qa
+.github/workflows/tf-qa-destroy.yml @qa
