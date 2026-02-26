@@ -1,0 +1,99 @@
+name: update-env-requirements
+
+on:
+  schedule:
+    - cron: "0 1 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install tooling
+        run: python -m pip install --upgrade pip packaging
+
+      - name: Update env requirements to latest stable versions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          import json
+          from urllib.request import urlopen
+          from packaging.version import Version, InvalidVersion
+
+          requirement_files = [
+              Path("envs/dev/requirements.txt"),
+              Path("envs/qa/requirements.txt"),
+              Path("envs/prod/requirements.txt"),
+          ]
+
+          pinned_pattern = re.compile(r"^\s*([A-Za-z0-9_.-]+)==([^\s#]+)(\s*(#.*)?)$")
+
+          def latest_stable_version(package_name: str) -> str:
+              with urlopen(f"https://pypi.org/pypi/{package_name}/json", timeout=30) as response:
+                  payload = json.load(response)
+
+              releases = payload.get("releases", {})
+              candidates = []
+              for version_text, files in releases.items():
+                  try:
+                      version = Version(version_text)
+                  except InvalidVersion:
+                      continue
+
+                  if version.is_prerelease:
+                      continue
+
+                  if files and all(file.get("yanked", False) for file in files):
+                      continue
+
+                  candidates.append(version)
+
+              if not candidates:
+                  info_version = payload.get("info", {}).get("version")
+                  return str(Version(info_version))
+
+              return str(max(candidates))
+
+          for requirements_path in requirement_files:
+              original_lines = requirements_path.read_text(encoding="utf-8").splitlines()
+              updated_lines = []
+
+              for line in original_lines:
+                  match = pinned_pattern.match(line)
+                  if not match:
+                      updated_lines.append(line)
+                      continue
+
+                  package_name, current_version, suffix, _ = match.groups()
+                  latest_version = latest_stable_version(package_name)
+                  if latest_version != current_version:
+                      print(f"{requirements_path}: {package_name} {current_version} -> {latest_version}")
+                  updated_lines.append(f"{package_name}=={latest_version}{suffix or ''}")
+
+              requirements_path.write_text("\n".join(updated_lines) + "\n", encoding="utf-8")
+          PY
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore(deps): update env requirements"
+          title: "chore(deps): update environment requirements"
+          body: |
+            Automated weekly dependency refresh for:
+            - `envs/dev/requirements.txt`
+            - `envs/qa/requirements.txt`
+            - `envs/prod/requirements.txt`
+          branch: chore/update-env-requirements
+          delete-branch: true
+          labels: dependencies
