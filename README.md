@@ -89,7 +89,7 @@ Run locally (dev by default):
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r envs/dev/requirements.txt
 ./scripts/generate_tls_certs.sh
 PYTHONPATH=envs/dev uvicorn app.main:app --host 0.0.0.0 --port 8443 --ssl-keyfile certs/server.key --ssl-certfile certs/server.crt
 ```

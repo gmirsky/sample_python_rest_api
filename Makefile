@@ -1,12 +1,17 @@
+# Base Makefile for local API and Terraform workflows.
+
+# Local Python toolchain paths.
 PYTHON ?= python3
 VENV_DIR ?= .venv
 PIP := $(VENV_DIR)/bin/pip
 PYTEST := $(VENV_DIR)/bin/pytest
 UVICORN := $(VENV_DIR)/bin/uvicorn
 
+# Environment selector for app code, tests, and dependencies.
 APP_ENV ?= dev
 APP_DIR := envs/$(APP_ENV)
 
+# Azure/OIDC backend settings for Terraform remote state.
 TFSTATE_RG ?= terraform_tfdata_rg
 TFSTATE_SA ?= $(TFSTATE_STORAGE_ACCOUNT)
 AZURE_TENANT_ID ?=
@@ -22,7 +27,7 @@ AZURE_CLIENT_ID ?=
 help:
 	@echo "Targets:"
 	@echo "  venv, install, test, ci-local, ci-local-fast, ci-local-tf, ci-local-all, ci-local-all-no-venv, tls-certs, run-api"
-	@echo "  APP_ENV=dev|qa|prod"
+	@echo "  APP_ENV=dev|qa|prod (install uses envs/\$$(APP_ENV)/requirements.txt)"
 	@echo "  tf-bootstrap-init|validate|plan|apply|destroy"
 	@echo "  tf-dev-init|validate|plan|apply|destroy"
 	@echo "  tf-qa-init|validate|plan|apply|destroy"
@@ -31,9 +36,11 @@ help:
 venv:
 	$(PYTHON) -m venv $(VENV_DIR)
 
+# Installs env-specific dependencies from envs/<APP_ENV>/requirements.txt.
 install: venv
-	$(PIP) install -r requirements.txt
+	$(PIP) install -r $(APP_DIR)/requirements.txt
 
+# Runs API tests for the selected APP_ENV.
 test:
 	PYTHONPATH=$(APP_DIR) $(PYTEST) -q $(APP_DIR)/tests/python
 
@@ -58,10 +65,11 @@ ci-local: test
 tls-certs:
 	./scripts/generate_tls_certs.sh
 
+# Runs HTTPS API locally; generate certs first with `make tls-certs`.
 run-api:
 	PYTHONPATH=$(APP_DIR) $(UVICORN) app.main:app --host 0.0.0.0 --port 8443 --ssl-keyfile certs/server.key --ssl-certfile certs/server.crt
 
-# Bootstrap
+# Terraform bootstrap for shared state resources.
 TF_BOOTSTRAP_DIR := terraform/bootstrap
 
 TF_BOOTSTRAP_VAR_ARGS = -var="tfstate_storage_account_name=$(TFSTATE_SA)"
@@ -93,7 +101,7 @@ define TF_BACKEND_ARGS
 -backend-config="client_id=$(AZURE_CLIENT_ID)"
 endef
 
-# Dev
+# Dev environment Terraform targets.
 TF_DEV_DIR := terraform/envs/dev
 
 tf-dev-init:
@@ -111,7 +119,7 @@ tf-dev-apply:
 tf-dev-destroy:
 	cd $(TF_DEV_DIR) && terraform destroy -auto-approve -input=false
 
-# QA
+# QA environment Terraform targets.
 TF_QA_DIR := terraform/envs/qa
 
 tf-qa-init:
@@ -129,7 +137,7 @@ tf-qa-apply:
 tf-qa-destroy:
 	cd $(TF_QA_DIR) && terraform destroy -auto-approve -input=false
 
-# Prod
+# Prod environment Terraform targets.
 TF_PROD_DIR := terraform/envs/prod
 
 tf-prod-init:

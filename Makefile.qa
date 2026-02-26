@@ -1,3 +1,4 @@
+# QA entrypoint: sets environment and delegates targets to base Makefile.
 APP_ENV := qa
 APP_DIR := envs/qa
 

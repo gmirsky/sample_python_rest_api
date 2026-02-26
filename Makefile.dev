@@ -1,3 +1,4 @@
+# Dev entrypoint: sets environment and delegates targets to base Makefile.
 APP_ENV := dev
 APP_DIR := envs/dev
 

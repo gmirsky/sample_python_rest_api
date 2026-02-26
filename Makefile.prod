@@ -1,3 +1,4 @@
+# Prod entrypoint: sets environment and delegates targets to base Makefile.
 APP_ENV := prod
 APP_DIR := envs/prod
 
